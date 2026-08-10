@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+*/node_modules/
+.pnp
+.pnp.js
+
+# Python Virtual Environments & Caches
+.venv/
+*/.venv/
+venv/
+*/venv/
+env/
+*/env/
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+.ultralytics/
+*/.ultralytics/
+
+# Pretrained Model Weights (large files > 50MB-100MB exceed GitHub limits)
+server/*.pt
+*.pt
+*.onnx
+*.bin
+*.engine
+
+# Next.js build outputs & logs
+.next/
+*/.next/
+.next-dev/
+*/.next-dev/
+out/
+build/
+dist/
+*.log
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
+!example.env
+!.env.example
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Expo / Mobile
+.expo/
+*/.expo/

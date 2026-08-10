@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: labelling
+      POSTGRES_USER: labelling
+      POSTGRES_PASSWORD: labelling
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/workspace_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+  api:
+    build: ./server
+    environment:
+      DATABASE_URL: postgresql://labelling:labelling@postgres:5432/labelling
+      YOLO_MODEL: yolo11n
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+volumes:
+  postgres_data:

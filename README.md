@@ -1,67 +1,223 @@
-# 📱 AI-Powered Image Labeling & Analysis App (Mobile Labelling App)
+# 🌟 SceneAI Tool — AI-Powered Computer Vision & Labeling Platform
 
-This project is a comprehensive mobile image processing, labeling, and analysis application built with **React Native (Expo)** and **Moondream AI**. Users can perform AI-assisted object detection, segmentation, and detailed analysis on images captured via camera or selected from the gallery.
+> **SceneAI Tool** is an end-to-end, enterprise-grade platform for AI-assisted image annotation, dataset management, object detection, segmentation, and real-time computer vision inference across **Web**, **Mobile**, and **Cloud/API**.
 
-![Main Screen](images/1.png)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React Native](https://img.shields.io/badge/React_Native-Expo_SDK_52-61DAFB?style=for-the-badge&logo=react)](https://reactnative.dev/)
+[![YOLO](https://img.shields.io/badge/YOLO-v8_|_v11-00FFFF?style=for-the-badge&logo=ultralytics)](https://ultralytics.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Auth_&_DB-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-## 🚀 Quick Start (Download App)
+---
 
-Want to try the app immediately without building it? You can download the latest Android build directly from the link below:
+## 📸 System Previews & Architecture
 
-👉 **[Download Android App Bundle (.aab)](https://expo.dev/artifacts/eas/boRBJy4m6TmgyMASrDNubC.aab)**
-
-> *Note: This is an `.aab` file intended for distribution. To install it on a device, you may need to use bundletool or deploy it via the Google Play Console internal track.*
-
-## 🌟 Features
-
-The application includes all the features expected from a modern mobile labeling tool:
-
-* **Multiple Input Methods:** Instant photo capture via Camera or image selection from Gallery.
-* **AI-Powered Analysis (Moondream):** Analyzes images using an advanced vision model.
-* **Various Labeling Modes:**
-    * 📦 **Bounding Box:** Detect objects by enclosing them in boxes.
-    * 📍 **Point Marker:** Focus on specific points.
-    * 🎨 **Segmentation:** Pixel-based separation of object boundaries.
-* **Secure API Management:** User-based API key storage and management.
-* **Dark/Light Mode:** User-friendly interface responsive to device themes.
-
-## 📸 App Preview
-
-Here are screenshots demonstrating the application flow:
-
-| Entry & Interface | Camera & Gallery Selection |
+| Web AI Annotation & Dashboard | Mobile Camera & Live Inference |
 | :---: | :---: |
-| ![Interface](images/2.png) | ![Camera](images/3.png) |
-| *Modern & Clean UI* | *Camera Integration* |
+| ![Web Overview](images/1.png) | ![Mobile Camera](images/3.png) |
+| *Full-featured Next.js 14 Workspace* | *Expo / React Native Live Detection* |
 
-| Analysis & Detection | Results & Settings |
+| Detection & Segmentation | Model Analysis & Settings |
 | :---: | :---: |
-| ![Analysis 1](images/4.png) | ![Result 1](images/8.png) |
-| ![Analysis 2](images/5.png) | ![Result 2](images/9.png) |
-| ![Analysis 3](images/6.png) | ![Settings](images/10.png) |
-| ![Analysis 4](images/7.png) | ![Menu](images/11.png) |
+| ![Detection](images/4.png) | ![Analysis](images/8.png) |
+| ![Segmentation](images/6.png) | ![Settings](images/10.png) |
 
-## 🛠 Technical Infrastructure
+---
 
-The project is built with the latest technologies for performance and developer experience:
+## 🏗️ Architecture Overview
 
-* **Framework:** React Native (Expo SDK 52)
-* **Language:** TypeScript
-* **Navigation:** Expo Router (File-based routing)
-* **AI Service:** Moondream API (For image understanding and processing)
-* **State Management:** React Context API (`ApiKeyContext`, `ThemeContext`)
-* **UI Components:** Custom Themed View/Text and Overlay components.
+```mermaid
+graph TD
+    ClientWeb["🌐 Next.js Web App (localhost:3000)"] -->|REST / JSON| APIServer["⚡ FastAPI Server (localhost:8000)"]
+    ClientMobile["📱 React Native Mobile (Expo)"] -->|REST / JSON| APIServer
+    ClientWeb -->|Auth & RBAC| Supabase["🛡️ Supabase (Auth, Postgres, Storage)"]
+    ClientMobile -->|Auth / API Keys| Supabase
 
-## 🚀 Installation & Setup
+    subgraph BackendEngine ["🧠 AI Inference Core"]
+        APIServer --> YOLO["YOLOv8 / YOLO11 (Detection & Seg)"]
+        APIServer --> BLIP["BLIP / Moondream (VQA & Captioning)"]
+        APIServer --> TorchEngine["PyTorch / Torchvision Runtime"]
+    end
+```
 
-Follow these steps to run the project on your local machine and install it on your phone.
+---
 
-### 1. Prerequisites
+## ✨ Key Features
 
-* **Node.js:** Ensure Node.js (LTS version recommended) is installed.
-* **Git:** To clone the project.
-* **Expo Go App:**
-    * **Android:** Download "Expo Go" from the Google Play Store.
-    * **iOS:** Download "Expo Go" from the App Store.
+### 1. 🌐 Next.js 14 Web Workspace (`/web`)
+* **Interactive Labeling Editor:** Real-time Bounding Box, Polygon Segmentation, and Point Marker overlays on canvas.
+* **Dataset Management:** Upload, organize, label, and export datasets in standard COCO and YOLO formats.
+* **Role-Based Authentication (RBAC):**
+  * **Super Administrator:** Full workspace control, user management, and system metrics.
+  * **Standard User:** Annotation, inference, and personal dataset creation.
+* **Modern Auth Options:**
+  * ✨ Passwordless **Magic Verification Link**
+  * 🔢 **6-Digit Email OTP** verification
+  * 🔒 Standard Email & Password
+  * 🌐 Google OAuth Social Login
+* **Dark / Light Mode:** Sleek glassmorphic theme with Tailwind CSS.
 
+### 2. ⚡ FastAPI AI Backend (`/server`)
+* **Hot-Swappable YOLO Models:** Real-time detection & segmentation using `yolo11n`, `yolo11x`, `yolov8n-seg`, and `yolov8s-seg`.
+* **Zero-Restart Model Switching:** Switch active inference models via simple API calls.
+* **Natural Language Vision:** Image captioning and visual question answering (VQA) powered by transformers.
+* **Interactive API Docs:** Automatic Swagger UI at `http://localhost:8000/docs`.
 
+### 3. 📱 Mobile Application (`/MobileApp`)
+* Built with **React Native** and **Expo SDK 52** with Expo Router.
+* Instant camera capture & gallery image processing.
+* Real-time mobile overlays for bounding boxes and segmented polygons.
+* Offline-capable API key configuration and multilingual support.
+
+---
+
+## 📁 Repository Structure
+
+```text
+SceneAI-Tool/
+│
+├── 📁 server/                              # Python / FastAPI Backend & AI Models
+│   ├── 📄 Dockerfile                       # Container definition for inference service
+│   ├── 📄 main.py                          # FastAPI application & REST endpoints
+│   ├── 📄 models.py                        # YOLO & Vision Model inference manager
+│   ├── 📄 image_utils.py                   # SVG / Polygon conversion utilities
+│   ├── 📄 requirements.txt                 # Python dependencies (PyTorch, Ultralytics, FastAPI)
+│   └── 📄 workspace_schema.sql             # SQL Schema for PostgreSQL storage
+│
+├── 📁 web/                                 # Next.js 14 Web Frontend
+│   ├── 📁 app/                             # Next.js App Router (Pages & Layouts)
+│   │   ├── 📁 admin/                       # Administrator management console
+│   │   ├── 📁 editor/                      # Interactive labeling canvas
+│   │   ├── 📁 datasets/                    # Dataset workspace
+│   │   ├── 📁 login/                       # Supabase Auth (Magic Link, OTP, Password)
+│   │   └── 📁 analysis/                    # Image & detection analytics
+│   ├── 📁 components/                      # Reusable UI overlays & widgets
+│   ├── 📁 context/                         # AuthContext, ServerContext, ThemeContext
+│   ├── 📁 lib/                             # Supabase client singleton
+│   └── 📁 services/                        # Inference API & image store helpers
+│
+├── 📁 MobileApp/                           # React Native / Expo Mobile App
+│   ├── 📁 app/                             # File-based navigation (tabs & editor)
+│   ├── 📁 components/                      # Mobile UI overlays & camera view
+│   ├── 📁 context/                         # ApiKey, Language, and Theme contexts
+│   └── 📁 services/                        # Mobile image processing services
+│
+├── 📁 images/                              # Preview screenshots and UI demo assets
+├── 📄 docker-compose.yml                   # Multi-container orchestration (DB + Backend)
+├── 📄 supabase_schema.sql                  # Supabase database initialization script
+└── 📄 README.md                            # Project documentation
+```
+
+---
+
+## 🚀 Quickstart Guide
+
+### Prerequisites
+* **Node.js** (v18+ recommended)
+* **Python** (v3.10+ recommended)
+* **Git**
+
+---
+
+### 1. 🐍 Backend Setup (FastAPI)
+
+```bash
+# Navigate to server directory
+cd server
+
+# Create and activate virtual environment
+python -m venv .venv
+
+# On Windows (PowerShell):
+.\.venv\Scripts\Activate.ps1
+# On Linux / macOS:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the FastAPI server
+uvicorn main:app --reload --port 8000
+```
+> Server running at: **`http://localhost:8000`**  
+> Swagger Documentation: **`http://localhost:8000/docs`**
+
+---
+
+### 2. 🌐 Web Frontend Setup (Next.js)
+
+```bash
+# Navigate to web directory
+cd web
+
+# Install dependencies
+npm install
+
+# Start Next.js development server
+npm run dev
+```
+> Web application running at: **`http://localhost:3000`**
+
+---
+
+### 3. 📱 Mobile App Setup (Expo)
+
+```bash
+# Navigate to MobileApp directory
+cd MobileApp
+
+# Install dependencies
+npm install
+
+# Start Expo development server
+npx expo start
+```
+> Scan the QR code with **Expo Go** (Android / iOS) to run on your device.
+
+---
+
+## 🔌 API Endpoints Summary
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | Server health check |
+| `GET` | `/classes` | List of 80 supported COCO classes |
+| `GET` | `/model` | Retrieve current active model configuration |
+| `POST` | `/model` | Hot-swap active YOLO model |
+| `POST` | `/detect` | Perform object detection (returns bounding boxes) |
+| `POST` | `/segment` | Perform semantic segmentation (returns SVG path & bbox) |
+| `POST` | `/point` | Identify center points for target objects |
+| `POST` | `/caption` | Generate natural language caption for image |
+| `POST` | `/query` | Visual Question Answering (VQA) on image |
+| `GET` | `/api/projects` | List all labeling projects |
+| `POST` | `/api/projects` | Create a new labeling project |
+
+---
+
+## 🛡️ Authentication & Supabase Setup
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Execute [supabase_schema.sql](supabase_schema.sql) in the **Supabase SQL Editor**.
+3. Add your Supabase credentials into `web/.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+   ```
+4. Default primary administrator: `sharvilvichare2704@gmail.com` *(receives automatic Super Admin role)*.
+
+---
+
+## 🐳 Docker Deployment
+
+Run the complete backend stack with Docker Compose:
+
+```bash
+docker-compose up -d --build
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. Feel free to use and extend it!
