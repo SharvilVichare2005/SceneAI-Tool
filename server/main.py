@@ -24,7 +24,8 @@ import os
 import secrets
 from typing import Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
@@ -42,20 +43,48 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Server"] = "SceneAI-Shield-Engine"
+    return response
+
+
+@app.exception_handler(Exception)
+async def sanitized_exception_handler(request: Request, exc: Exception):
+    if isinstance(exc, HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+        )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Inference request could not be processed. Traceback sanitized."},
+    )
+
+
 class CaptionReq(BaseModel):
     image_url: str
     length: str = "normal"
+    model: str = ""
+    mode_tier: str = "high"
 
 
 class QueryReq(BaseModel):
     image_url: str
     question: str
+    model: str = ""
+    mode_tier: str = "high"
 
 
 class ObjectReq(BaseModel):
     image_url: str
     object: str = ""
     conf: float = 0.2
+    model: str = ""
+    mode_tier: str = "high"
 
 
 class ModelReq(BaseModel):
@@ -272,7 +301,7 @@ async def caption(req: CaptionReq):
 async def query(req: QueryReq):
     pil, _ = await run_in_threadpool(_decode, req.image_url)
     try:
-        answer = await run_in_threadpool(manager.query, pil, req.question)
+        answer = await run_in_threadpool(manager.query, pil, req.question, req.mode_tier, req.model)
     except (ImportError, ModuleNotFoundError):
         answer = "Image received. Install the Transformers runtime to enable local visual question answering."
     return {"answer": answer}
@@ -282,7 +311,7 @@ async def query(req: QueryReq):
 async def detect(req: ObjectReq):
     _, npimg = await run_in_threadpool(_decode, req.image_url)
     try:
-        objs, _ = await run_in_threadpool(manager.detect, npimg, req.object, req.conf)
+        objs, _ = await run_in_threadpool(manager.detect, npimg, req.object, req.conf, req.model)
     except (ImportError, ModuleNotFoundError):
         objs = []
     return {"objects": objs}
@@ -292,7 +321,7 @@ async def detect(req: ObjectReq):
 async def point(req: ObjectReq):
     _, npimg = await run_in_threadpool(_decode, req.image_url)
     try:
-        pts = await run_in_threadpool(manager.points, npimg, req.object, req.conf)
+        pts = await run_in_threadpool(manager.points, npimg, req.object, req.conf, req.model)
     except (ImportError, ModuleNotFoundError):
         pts = []
     return {"points": pts}
@@ -301,12 +330,9 @@ async def point(req: ObjectReq):
 @app.post("/segment")
 async def segment(req: ObjectReq):
     _, npimg = await run_in_threadpool(_decode, req.image_url)
-    res = await run_in_threadpool(manager.segment, npimg, req.object, req.conf)
+    res = await run_in_threadpool(manager.segment, npimg, req.object, req.conf, req.model)
     if res is None:
-        raise HTTPException(
-            status_code=422,
-            detail=f"No '{req.object}' found to segment. Try another COCO class.",
-        )
+        return {"path": "", "bbox": [0, 0, 0, 0]}
     (poly, bbox_px), (W, H) = res
     path, bbox = polygon_to_svg(poly, bbox_px, W, H)
     return {"path": path, "bbox": bbox}

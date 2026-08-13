@@ -13,12 +13,14 @@ import {
   Video,
   WandSparkles,
   Shield,
+  ShieldCheck,
   LogOut,
   Crown,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ServerStatusBadge } from "@/components/ServerStatusBadge";
 import { useAuth } from "@/context/AuthContext";
+import { maskEmail } from "@/lib/security";
 
 const primaryLinks = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -37,21 +39,22 @@ export function Navbar() {
     pathname.startsWith("/datasets") ||
     pathname.startsWith("/training") ||
     pathname.startsWith("/models") ||
-    pathname.startsWith("/admin");
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/security");
 
   if (!workspaceShell) return <LegacyNavbar />;
 
   return (
     <aside className="hidden min-h-screen w-[248px] shrink-0 border-r border-slate-200 bg-white px-4 py-5 dark:border-slate-800 dark:bg-slate-900 lg:flex lg:flex-col">
       {/* Brand logo */}
-      <div className="flex items-center gap-2 px-3">
+      <Link href="/" className="flex items-center gap-2 px-3">
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-violet-600 text-white shadow-sm">
           <Sparkles size={18} />
         </span>
         <span className="text-[15px] font-bold tracking-tight">
-          Labelling<span className="text-violet-600">App</span>
+          Scene<span className="text-violet-600">AI</span>
         </span>
-      </div>
+      </Link>
 
       {/* Primary Workspace links */}
       <div className="mt-8 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
@@ -84,6 +87,22 @@ export function Navbar() {
             </Link>
           );
         })}
+
+        {/* Security Hub Link */}
+        <Link
+          href="/security"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+            pathname.startsWith("/security")
+              ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300"
+              : "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-slate-800"
+          }`}
+        >
+          <ShieldCheck size={17} className="text-emerald-500" />
+          <span>Security Hub</span>
+          <span className="ml-auto rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300">
+            Shield
+          </span>
+        </Link>
 
         {/* Admin Console Link (Visible only to Admin) */}
         {isAdmin && (
@@ -129,7 +148,7 @@ export function Navbar() {
           href="/settings"
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
         >
-          <Settings size={17} /> Settings
+          <Settings size={17} /> Settings &amp; Shield
         </Link>
 
         {/* User Card */}
@@ -156,8 +175,8 @@ export function Navbar() {
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2 dark:border-slate-700/60">
-            <span className="text-[10px] font-medium text-slate-400 truncate">
-              {user?.email}
+            <span className="text-[10px] font-medium text-slate-400 truncate max-w-[120px]">
+              {user?.email ? maskEmail(user.email, false) : "signed_out"}
             </span>
             <button
               onClick={signOut}
@@ -184,7 +203,7 @@ function LegacyNavbar() {
             <Sparkles size={17} />
           </span>
           <span className="hidden sm:inline">
-            Labelling<span className="text-violet-600">App</span>
+            Scene<span className="text-violet-600">AI</span>
           </span>
         </Link>
         <nav className="flex items-center gap-1">
@@ -201,6 +220,13 @@ function LegacyNavbar() {
           >
             <Video size={16} />
             <span className="hidden sm:inline">Video</span>
+          </Link>
+          <Link
+            href="/security"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-slate-800"
+          >
+            <ShieldCheck size={16} className="text-emerald-500" />
+            <span className="hidden sm:inline">Security Hub</span>
           </Link>
           {isAdmin && (
             <Link
@@ -248,9 +274,16 @@ export function MobileTopbar() {
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-violet-600 text-white">
           <Sparkles size={16} />
         </span>
-        Labelling<span className="text-violet-600">App</span>
+        Scene<span className="text-violet-600">AI</span>
       </Link>
       <div className="flex items-center gap-2">
+        <Link
+          href="/security"
+          className="rounded-lg bg-emerald-500/15 p-1.5 text-emerald-600 dark:text-emerald-400"
+          title="Security Hub"
+        >
+          <ShieldCheck size={16} />
+        </Link>
         {isAdmin && (
           <Link
             href="/admin"
